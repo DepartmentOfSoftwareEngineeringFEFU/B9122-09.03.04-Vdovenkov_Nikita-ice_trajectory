@@ -1,5 +1,169 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Моделирование движения судов{% endblock %}
 
 {% block content %}
+<div id="panel">
+
+    <div>
+        <h2>Акватория</h2>
+        <select id="water-area-select">
+            <option value="">выберите акваторию</option>
+        </select>
+    </div>
+
+    <div>
+        <h2>Ледовый класс судна</h2>
+        <select id="ice-class-select">
+            <option value="no_ice">Без ледового класса</option>
+            <option value="Ice1">Ice1</option>
+            <option value="Ice2">Ice2</option>
+            <option value="Ice3">Ice3</option>
+            <option value="Arc4">Arc4</option>
+            <option value="Arc5">Arc5</option>
+            <option value="Arc6">Arc6</option>
+            <option value="Arc7">Arc7</option>
+            <option value="Arc8">Arc8</option>
+            <option value="Arc9">Arc9</option>
+            <option value="Icebraker6">Icebraker6</option>
+            <option value="Icebraker7">Icebraker7</option>
+        </select>
+    </div>
+
+    <div class="route-points" id="route-points-block" style="display:none;">
+        <h2>Маршрут</h2>
+        <p>Начало: <span id="start-coords">не выбрано</span></p>
+        <p>Конец: <span id="end-coords">не выбрано</span></p>
+        <button class="point-btn" id="pick-start-btn">Выбрать начало</button>
+        <button class="point-btn" id="pick-end-btn" style="margin-top:4px;">Выбрать конец</button>
+    </div>
+
+    <button id="run-btn" disabled>Построить маршрут</button>
+
+    <div id="status"></div>
+
+    <div class="info-block">
+        <h2>Текущее состояние судна</h2>
+        <p>Широта: <span id="cur-lat">—</span></p>
+        <p>Долгота: <span id="cur-lon">—</span></p>
+        <p>Скорость: <span id="cur-speed">—</span></p>
+    </div>
+
+    <hr class="divider">
+
+    <div>
+        <h2>Слои на карте</h2>
+        <div class="layer-toggles">
+            <label class="toggle-row">
+                <input type="checkbox" id="toggle-heatmap-global"> Тепловая карта (все данные)
+            </label>
+            <label class="toggle-row">
+                <input type="checkbox" id="toggle-heatmap-area" disabled> Тепловая карта (акватория)
+            </label>
+            <label class="toggle-row">
+                <input type="checkbox" id="toggle-courses" disabled> Курсы судов (стрелки)
+            </label>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <div>
+        <h2>Управление акваториями</h2>
+    </div>
+
+    <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-rect" onclick="switchMode('rect')">Прямоугольник</button>
+        <button class="mode-tab" id="tab-circle" onclick="switchMode('circle')">Центр+радиус</button>
+    </div>
+
+    <div id="mode-rect">
+        <div id="draw-hint" style="font-size:12px; color:#888;">
+            Нарисуйте прямоугольник на карте чтобы добавить акваторию
+        </div>
+
+        <div id="sliders-block" style="display:none;">
+            <div class="slider-group">
+                <p style="font-size:12px; color:#555; margin-bottom:4px;">Срезание углов (восьмиугольник):</p>
+                <div class="slider-row">
+                    <label>↖ Верх-лево</label>
+                    <input type="range" id="cut-tl" min="0" max="40" value="15" oninput="updateOctagon()">
+                    <span id="cut-tl-val">15%</span>
+                </div>
+                <div class="slider-row">
+                    <label>↗ Верх-право</label>
+                    <input type="range" id="cut-tr" min="0" max="40" value="15" oninput="updateOctagon()">
+                    <span id="cut-tr-val">15%</span>
+                </div>
+                <div class="slider-row">
+                    <label>↙ Низ-лево</label>
+                    <input type="range" id="cut-bl" min="0" max="40" value="15" oninput="updateOctagon()">
+                    <span id="cut-bl-val">15%</span>
+                </div>
+                <div class="slider-row">
+                    <label>↘ Низ-право</label>
+                    <input type="range" id="cut-br" min="0" max="40" value="15" oninput="updateOctagon()">
+                    <span id="cut-br-val">15%</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="save-area-block" style="display:none; flex-direction:column; gap:6px; margin-top:8px;">
+            <input type="text" id="area-name-input" placeholder="Название акватории"/>
+            <button class="btn-green" id="save-area-btn">Сохранить акваторию</button>
+            <button class="btn-red" id="cancel-area-btn">Отмена</button>
+        </div>
+    </div>
+
+    <div id="mode-circle" style="display:none;">
+        <div class="radius-block">
+            <p>Кликните на карте чтобы выбрать центр акватории</p>
+            <div class="slider-row" style="margin-bottom:8px;">
+                <label>Радиус (км)</label>
+                <input type="range" id="circle-radius" min="50" max="500" value="150" oninput="updateCirclePreview()">
+                <span id="circle-radius-val">150</span>
+            </div>
+            <div class="slider-row">
+                <label>Срезание углов</label>
+                <input type="range" id="circle-cut" min="5" max="40" value="20" oninput="updateCirclePreview()">
+                <span id="circle-cut-val">20%</span>
+            </div>
+        </div>
+        <div id="save-circle-block" style="display:none; flex-direction:column; gap:6px; margin-top:8px;">
+            <input type="text" id="circle-name-input" placeholder="Название акватории"/>
+            <button class="btn-green" id="save-circle-btn">Сохранить акваторию</button>
+            <button class="btn-red" id="cancel-circle-btn">Отмена</button>
+        </div>
+    </div>
+
+    <div id="area-list"></div>
+
+    <hr class="divider">
+
+    <div>
+        <h2>Ледовая обстановка</h2>
+    </div>
+
+    <div id="ice-hint" style="font-size:12px; color:#888;">
+        Выберите тип льда и нарисуйте зону на карте
+    </div>
+
+    <div id="ice-type-select" style="display:none; flex-direction:column; gap:6px;">
+        <div class="ice-color-select">
+            <button class="ice-color-btn light active" onclick="selectIceType('light', this)">Лёгкий</button>
+            <button class="ice-color-btn medium" onclick="selectIceType('medium', this)">Средний</button>
+            <button class="ice-color-btn heavy" onclick="selectIceType('heavy', this)">Тяжёлый</button>
+        </div>
+    </div>
+
+    <div id="save-ice-block" style="display:none; flex-direction:column; gap:6px;">
+        <button class="btn-green" id="save-ice-btn">Сохранить зону</button>
+        <button class="btn-red" id="cancel-ice-btn">Отмена</button>
+    </div>
+
+    <div id="ice-zone-list"></div>
+
+</div>
+
 <div id="map"></div>
 {% endblock %}

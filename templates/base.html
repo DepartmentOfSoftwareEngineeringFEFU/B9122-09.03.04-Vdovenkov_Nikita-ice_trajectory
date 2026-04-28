@@ -2,15 +2,31 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мониторинг судов</title>
-    {% load static %}
+    <title>{% block title %}Моделирование движения судов{% endblock %}</title>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{% static 'js/map.js' %}"></script>
+
+{% block content %}{% endblock %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+<script src="{% static 'js/utils.js' %}"></script>
+<script src="{% static 'js/map.js' %}"></script>
+<script src="{% static 'js/layers.js' %}"></script>
+<script src="{% static 'js/areas.js' %}"></script>
+<script src="{% static 'js/route.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>
