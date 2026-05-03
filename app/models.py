@@ -2,8 +2,23 @@ from django.db import models
 
 
 class Ship(models.Model):
+    class IceClass(models.TextChoices):
+        NO_ICE = "no_ice", "Без ледового класса"
+        ICE1 = "Ice1", "Ice1"
+        ICE2 = "Ice2", "Ice2"
+        ICE3 = "Ice3", "Ice3"
+        ARC4 = "Arc4", "Arc4"
+        ARC5 = "Arc5", "Arc5"
+        ARC6 = "Arc6", "Arc6"
+        ARC7 = "Arc7", "Arc7"
+        ARC8 = "Arc8", "Arc8"
+        ARC9 = "Arc9", "Arc9"
+        ICEBRAKER6 = "Icebraker6", "Icebraker6"
+        ICEBRAKER7 = "Icebraker7", "Icebraker7"
+
     mmsi = models.BigIntegerField(unique=True)
     name = models.CharField(max_length=255, blank=True)
+    ice_class = models.CharField(max_length=20, choices=IceClass.choices, default=IceClass.NO_ICE)
 
     def __str__(self):
         return self.name or f"MMSI {self.mmsi}"

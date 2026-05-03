@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from app.views import (
     ShipViewSet, WaterAreaViewSet, WaterAreaPointViewSet,
-    IceZoneViewSet, index, heatmap_data, courses_data
+    IceZoneViewSet, index, heatmap_data, courses_data, ice_classes
 )
 
 router = DefaultRouter()
@@ -18,4 +18,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/heatmap/', heatmap_data),
     path('api/courses/', courses_data),
+    path('api/ice-classes/', ice_classes),
 ]
