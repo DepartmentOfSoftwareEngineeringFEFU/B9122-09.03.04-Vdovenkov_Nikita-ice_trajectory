@@ -24,9 +24,9 @@ const AppState = {
 };
 
 const ICE_COLORS = {
-    light:  { color: "#4caf50", fillColor: "#4caf50" },
-    medium: { color: "#ff9800", fillColor: "#ff9800" },
-    heavy:  { color: "#f44336", fillColor: "#f44336" },
+    none:  { color: "#2196F3", fillColor: "#2196F3" },
+    light: { color: "#4caf50", fillColor: "#4caf50" },
+    heavy: { color: "#f44336", fillColor: "#f44336" },
 };
 
 const drawnItems = new L.FeatureGroup();

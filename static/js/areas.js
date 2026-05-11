@@ -291,7 +291,7 @@ function loadIceZones(areaId) {
                 }).addTo(map);
                 AppState.iceLayers[zone.id] = layer;
 
-                const labels = { light: "Лёгкий", medium: "Средний", heavy: "Тяжёлый" };
+                const labels = { none: "Открытая вода", light: "Молодой", heavy: "Толстый" };
                 const div = document.createElement("div");
                 div.className = "ice-item";
                 div.innerHTML = `

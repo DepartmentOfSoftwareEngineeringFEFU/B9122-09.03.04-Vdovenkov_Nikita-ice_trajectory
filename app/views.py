@@ -18,18 +18,18 @@ from .services.route_service_clusters import generate_cluster_route
 
 
 ICE_IMPACT = {
-    "no_ice":     {"light": 1.0,  "medium": 1.0,  "heavy": 1.0},
-    "Ice1":       {"light": 10.0, "medium": 30.0,  "heavy": float("inf")},
-    "Ice2":       {"light": 8.0,  "medium": 25.0,  "heavy": float("inf")},
-    "Ice3":       {"light": 7.0,  "medium": 20.0,  "heavy": float("inf")},
-    "Arc4":       {"light": 5.0,  "medium": 14.0,  "heavy": 25.0},
-    "Arc5":       {"light": 4.0,  "medium": 14.0,  "heavy": float("inf")},
-    "Arc6":       {"light": 3.0,  "medium": 10.0,  "heavy": 20.0},
-    "Arc7":       {"light": 2.0,  "medium": 7.0,   "heavy": 14.0},
-    "Arc8":       {"light": 1.5,  "medium": 5.0,   "heavy": 10.0},
-    "Arc9":       {"light": 1.2,  "medium": 3.0,   "heavy": 7.0},
-    "Icebraker6": {"light": 1.0,  "medium": 2.0,   "heavy": 5.0},
-    "Icebraker7": {"light": 1.0,  "medium": 1.5,   "heavy": 3.0},
+    "no_ice":     {"none": 2.0, "light": float("inf"), "heavy": float("inf")},
+    "Ice1":       {"none": 2.0, "light": 10.0,         "heavy": float("inf")},
+    "Ice2":       {"none": 2.0, "light": 10.0,         "heavy": float("inf")},
+    "Ice3":       {"none": 2.0, "light": 10.0,         "heavy": float("inf")},
+    "Arc4":       {"none": 2.0, "light": 10.0,         "heavy": 30.0},
+    "Arc5":       {"none": 2.0, "light": 10.0,         "heavy": 30.0},
+    "Arc6":       {"none": 2.0, "light": 10.0,         "heavy": 25.0},
+    "Arc7":       {"none": 2.0, "light": 10.0,         "heavy": 20.0},
+    "Arc8":       {"none": 2.0, "light": 10.0,         "heavy": 15.0},
+    "Arc9":       {"none": 2.0, "light": 10.0,         "heavy": 13.0},
+    "Icebraker6": {"none": 2.0, "light": 10.0,         "heavy": 10.0},
+    "Icebraker7": {"none": 2.0, "light": 10.0,         "heavy": 5.0},
 }
 
 ICE_CLASSES = list(ICE_IMPACT.keys())

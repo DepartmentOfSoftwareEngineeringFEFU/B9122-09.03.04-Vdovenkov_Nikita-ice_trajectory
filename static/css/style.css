@@ -73,6 +73,7 @@ button:disabled { background: #aaa; cursor: not-allowed; }
 .ice-color-btn.light { background: #4caf50; }
 .ice-color-btn.medium { background: #ff9800; }
 .ice-color-btn.heavy { background: #f44336; }
+.ice-color-btn.none { background: #2196F3; }
 
 .mode-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
 

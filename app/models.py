@@ -62,10 +62,9 @@ class WaterAreaPoint(models.Model):
 
 class IceZone(models.Model):
     ICE_TYPES = [
-        ("none", "Чистая вода"),
-        ("light", "Лёгкий лёд"),
-        ("medium", "Средний лёд"),
-        ("heavy", "Тяжёлый лёд"),
+        ("none", "Открытая вода"),
+        ("light", "Молодой лёд"),
+        ("heavy", "Толстый лёд"),
     ]
 
     area = models.ForeignKey(WaterArea, on_delete=models.CASCADE, related_name="ice_zones")
