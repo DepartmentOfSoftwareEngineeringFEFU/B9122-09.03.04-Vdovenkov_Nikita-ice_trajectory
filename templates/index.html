@@ -3,12 +3,12 @@
 {% block title %}Моделирование движения судов{% endblock %}
 
 {% block content %}
-<div id="panel">
+<div id="panel-left">
 
     <div>
         <h2>Акватория</h2>
         <select id="water-area-select">
-            <option value="">выберите акваторию</option>
+            <option value="">— выберите акваторию —</option>
         </select>
     </div>
 
@@ -66,7 +66,11 @@
         </div>
     </div>
 
-    <hr class="divider">
+</div>
+
+<div id="map"></div>
+
+<div id="panel-right">
 
     <div>
         <h2>Управление акваториями</h2>
@@ -84,24 +88,24 @@
 
         <div id="sliders-block" style="display:none;">
             <div class="slider-group">
-                <p style="font-size:12px; color:#555; margin-bottom:4px;">Срезание углов (восьмиугольник):</p>
+                <p style="font-size:12px; color:#555; margin-bottom:4px;">Срезание углов:</p>
                 <div class="slider-row">
-                    <label>↖ Верх-лево</label>
+                    <label>Верх-лево</label>
                     <input type="range" id="cut-tl" min="0" max="40" value="15" oninput="updateOctagon()">
                     <span id="cut-tl-val">15%</span>
                 </div>
                 <div class="slider-row">
-                    <label>↗ Верх-право</label>
+                    <label>Верх-право</label>
                     <input type="range" id="cut-tr" min="0" max="40" value="15" oninput="updateOctagon()">
                     <span id="cut-tr-val">15%</span>
                 </div>
                 <div class="slider-row">
-                    <label>↙ Низ-лево</label>
+                    <label>Низ-лево</label>
                     <input type="range" id="cut-bl" min="0" max="40" value="15" oninput="updateOctagon()">
                     <span id="cut-bl-val">15%</span>
                 </div>
                 <div class="slider-row">
-                    <label>↘ Низ-право</label>
+                    <label>Низ-право</label>
                     <input type="range" id="cut-br" min="0" max="40" value="15" oninput="updateOctagon()">
                     <span id="cut-br-val">15%</span>
                 </div>
@@ -165,5 +169,4 @@
 
 </div>
 
-<div id="map"></div>
 {% endblock %}
