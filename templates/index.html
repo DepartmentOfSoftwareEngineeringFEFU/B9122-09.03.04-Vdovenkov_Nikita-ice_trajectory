@@ -3,6 +3,7 @@
 {% block title %}Моделирование движения судов{% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div id="panel-left">
 
     <div>
@@ -29,6 +30,7 @@
     </div>
 
     <button id="run-btn" disabled>Построить маршрут</button>
+    <button id="clear-routes-btn" style="display:none;">Очистить маршруты</button>
 
     <div id="status"></div>
 
@@ -38,6 +40,8 @@
         <p>Долгота: <span id="cur-lon">—</span></p>
         <p>Скорость: <span id="cur-speed">—</span></p>
     </div>
+
+    <button id="export-xml-btn" style="margin-top:8px; background:#7b1fa2; color:white;">Выгрузить данные в XML</button>
 
     <hr class="divider">
 

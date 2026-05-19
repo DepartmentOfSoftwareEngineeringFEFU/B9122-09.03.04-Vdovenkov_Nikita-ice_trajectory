@@ -237,7 +237,7 @@ def generate_cluster_route(start_lat, start_lon, end_lat, end_lon, area_polygon=
     progress(30, "Строим граф маршрута...")
     vertices, edges, finish_idx = build_layered_graph(
         start_lat, start_lon, end_lat, end_lon,
-        n_layers=16, m_half=5
+        n_layers=4, m_half=3
     )
 
     progress(40, f"Граф: {len(vertices)} вершин, {len(edges)} рёбер")

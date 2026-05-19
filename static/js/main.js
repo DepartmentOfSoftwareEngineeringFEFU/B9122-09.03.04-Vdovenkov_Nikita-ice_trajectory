@@ -58,6 +58,8 @@ document.getElementById("water-area-select").addEventListener("change", () => {
 
     updateLayerToggles(areaId);
 
+    document.getElementById('clear-routes-btn').style.display = areaId ? 'block' : 'none';
+
     if (!areaId) {
         status.textContent = "";
         loadIceZones(null);
@@ -95,6 +97,7 @@ document.getElementById("water-area-select").addEventListener("change", () => {
     document.getElementById("draw-area-btn").style.background = "#43a047";
 
     loadIceZones(areaId);
+    loadSavedRoutes(selected.text);
     status.textContent = "";
 });
 

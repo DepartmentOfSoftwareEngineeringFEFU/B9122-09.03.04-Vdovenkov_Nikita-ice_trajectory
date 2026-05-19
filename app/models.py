@@ -81,3 +81,38 @@ class IceCondition(models.Model):
 
     def __str__(self):
         return f"{self.area.name} — {self.ice_type}"
+
+
+class Route(models.Model):
+    area_name = models.CharField(max_length=255)  
+    start_lat = models.FloatField()
+    start_lon = models.FloatField()
+    end_lat = models.FloatField()
+    end_lon = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Маршрут {self.pk} - {self.area_name}"
+
+
+class RoutePoint(models.Model):
+    POINT_TYPES = [
+        ("начальная", "Начальная"),
+        ("промежуточная", "Промежуточная"),
+        ("конечная", "Конечная"),
+    ]
+
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="points")
+    order = models.PositiveIntegerField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    point_type = models.CharField(max_length=20, choices=POINT_TYPES, default="промежуточная")
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"Точка {self.order} ({self.point_type}) маршрута {self.route_id}"

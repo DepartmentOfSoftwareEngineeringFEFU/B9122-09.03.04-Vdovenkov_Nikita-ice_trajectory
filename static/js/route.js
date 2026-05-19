@@ -45,11 +45,83 @@ function setStatus(msg, pct) {
     }
 }
 
+AppState.savedRouteLayers = {};
+
+function drawSavedRoute(route) {
+    if (AppState.savedRouteLayers[route.id]) return;
+
+    const coords = route.points.map(p => [p.latitude, p.longitude]);
+    if (coords.length < 2) return;
+
+    const line = L.polyline(coords, { color: "blue", weight: 3, opacity: 0.7 }).addTo(map);
+
+    const startMarker = L.circleMarker(coords[0], {
+        radius: 8, color: "green", fillColor: "green", fillOpacity: 1
+    }).addTo(map).bindPopup(`Маршрут #${route.id}<br>Начало`);
+
+    const endMarker = L.circleMarker(coords[coords.length - 1], {
+        radius: 8, color: "red", fillColor: "red", fillOpacity: 1
+    }).addTo(map).bindPopup(`Маршрут #${route.id}<br>Конец`);
+
+    AppState.savedRouteLayers[route.id] = { line, startMarker, endMarker };
+    map.fitBounds(line.getBounds());
+}
+
+function clearSavedRoutes() {
+    Object.values(AppState.savedRouteLayers).forEach(({ line, startMarker, endMarker }) => {
+        map.removeLayer(line);
+        map.removeLayer(startMarker);
+        map.removeLayer(endMarker);
+    });
+    AppState.savedRouteLayers = {};
+}
+
+function loadSavedRoutes(areaName) {
+    if (!areaName) return;
+    fetch(`/api/routes/?area_name=${encodeURIComponent(areaName)}`)
+        .then(res => res.json())
+        .then(data => {
+            const routes = data.results || data;
+            routes.forEach(drawSavedRoute);
+        });
+}
+
+function saveRoute(areaName, sLat, sLon, eLat, eLon, routePoints) {
+    const points = routePoints.map((p, idx) => ({
+        order: idx,
+        latitude: p.latitude,
+        longitude: p.longitude,
+        point_type: { start: "начальная", end: "конечная", cluster: "промежуточная" }[p.type] || "промежуточная",
+    }));
+
+    fetch("/api/routes/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({
+            area_name: areaName,
+            start_lat: sLat,
+            start_lon: sLon,
+            end_lat:   eLat,
+            end_lon:   eLon,
+            points,
+        }),
+    })
+    .then(res => res.json())
+    .then(saved => drawSavedRoute(saved))
+    .catch(err => console.error("Ошибка сохранения маршрута:", err));
+}
+
 document.getElementById("run-btn").addEventListener("click", () => {
-    const areaId = document.getElementById("water-area-select").value;
+    const areaId   = document.getElementById("water-area-select").value;
     const iceClass = document.getElementById("ice-class-select").value;
 
     if (!areaId || !AppState.routeStart || !AppState.routeEnd) return;
+
+    const areaName = document.getElementById("water-area-select")
+        .options[document.getElementById("water-area-select").selectedIndex].text;
 
     clearRoute();
     setStatus("Запуск...", 0);
@@ -77,26 +149,12 @@ document.getElementById("run-btn").addEventListener("click", () => {
                 return;
             }
 
-            const coords = route.map(p => [p.latitude, p.longitude]);
-            AppState.trackLayer = L.polyline(coords, { color: "blue", weight: 3 }).addTo(map);
-
-            if (AppState.startMarker) map.removeLayer(AppState.startMarker);
-            if (AppState.endMarker) map.removeLayer(AppState.endMarker);
-
-            AppState.startMarker = L.circleMarker(coords[0], {
-                radius: 8, color: "green", fillColor: "green", fillOpacity: 1
-            }).addTo(map).bindPopup("Начало маршрута");
-
-            AppState.endMarker = L.circleMarker(coords[coords.length - 1], {
-                radius: 8, color: "red", fillColor: "red", fillOpacity: 1
-            }).addTo(map).bindPopup("Конец маршрута");
-
-            map.fitBounds(AppState.trackLayer.getBounds());
-
-            document.getElementById("cur-lat").textContent = sLat.toFixed(6);
-            document.getElementById("cur-lon").textContent = sLon.toFixed(6);
-            document.getElementById("cur-speed").textContent = "—";
+            saveRoute(areaName, sLat, sLon, eLat, eLon, route);
             setStatus(`Маршрут построен (${route.length} точек)`);
+
+            document.getElementById("cur-lat").textContent   = sLat.toFixed(6);
+            document.getElementById("cur-lon").textContent   = sLon.toFixed(6);
+            document.getElementById("cur-speed").textContent = "—";
 
         } else if (data.type === "error") {
             es.close();
@@ -110,4 +168,21 @@ document.getElementById("run-btn").addEventListener("click", () => {
         document.getElementById("run-btn").disabled = false;
         setStatus("Ошибка соединения");
     };
+});
+
+document.getElementById("clear-routes-btn").addEventListener("click", () => {
+    const areaName = document.getElementById("water-area-select")
+        .options[document.getElementById("water-area-select").selectedIndex].text;
+
+    if (!areaName || !confirm(`Удалить все маршруты для акватории "${areaName}"?`)) return;
+
+    fetch(`/api/routes/clear/?area_name=${encodeURIComponent(areaName)}`, {
+        method: "DELETE",
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+    })
+    .then(res => res.json())
+    .then(data => {
+        clearSavedRoutes();
+        setStatus(`Удалено маршрутов: ${data.deleted}`);
+    });
 });
