@@ -103,6 +103,8 @@ def route_progress(request):
 
         if error_box[0]:
             yield f"data: {json.dumps({'type': 'error', 'msg': error_box[0]})}\n\n"
+        elif result_box[0] is None:
+            yield f"data: {json.dumps({'type': 'warning', 'msg': 'Недостаточно данных АИС вблизи выбранных точек'})}\n\n"
         else:
             route_points = result_box[0]
             yield f"data: {json.dumps({'type': 'done', 'route': route_points})}\n\n"

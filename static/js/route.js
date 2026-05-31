@@ -6,7 +6,7 @@ document.getElementById("pick-start-btn").addEventListener("click", () => {
     } else {
         AppState.pickingMode = "start";
         document.getElementById("pick-start-btn").classList.add("selecting");
-        document.getElementById("pick-start-btn").textContent = "Кликните на карте";
+        document.getElementById("pick-start-btn").textContent = "Кликните на карте...";
         document.getElementById("pick-end-btn").classList.remove("selecting");
         document.getElementById("pick-end-btn").textContent = "Выбрать конец";
     }
@@ -20,7 +20,7 @@ document.getElementById("pick-end-btn").addEventListener("click", () => {
     } else {
         AppState.pickingMode = "end";
         document.getElementById("pick-end-btn").classList.add("selecting");
-        document.getElementById("pick-end-btn").textContent = "Кликните на карте";
+        document.getElementById("pick-end-btn").textContent = "Кликните на карте...";
         document.getElementById("pick-start-btn").classList.remove("selecting");
         document.getElementById("pick-start-btn").textContent = "Выбрать начало";
     }
@@ -31,9 +31,10 @@ function checkRunBtn() {
     document.getElementById("run-btn").disabled = !(areaId && AppState.routeStart && AppState.routeEnd);
 }
 
-function setStatus(msg, pct) {
+function setStatus(msg, pct, isError) {
     const statusEl = document.getElementById("status");
     if (pct !== undefined) {
+        statusEl.style.color = "";
         statusEl.innerHTML = `
             <div>${msg}</div>
             <div style="margin-top:6px; background:#ddd; border-radius:4px; height:8px; width:100%;">
@@ -41,6 +42,7 @@ function setStatus(msg, pct) {
             </div>
             <div style="font-size:11px; color:#888; margin-top:2px;">${pct}%</div>`;
     } else {
+        statusEl.style.color = isError ? "#e53935" : "";
         statusEl.textContent = msg;
     }
 }
@@ -130,6 +132,18 @@ document.getElementById("run-btn").addEventListener("click", () => {
     const { lat: sLat, lng: sLon } = AppState.routeStart;
     const { lat: eLat, lng: eLon } = AppState.routeEnd;
 
+    const dlat = (eLat - sLat) * Math.PI / 180;
+    const dlon = (eLon - sLon) * Math.PI / 180;
+    const sinDlat = Math.sin(dlat / 2);
+    const sinDlon = Math.sin(dlon / 2);
+    const a = sinDlat * sinDlat + Math.cos(sLat * Math.PI / 180) * Math.cos(eLat * Math.PI / 180) * sinDlon * sinDlon;
+    const distKm = 6371 * 2 * Math.asin(Math.sqrt(a));
+    if (distKm < 1.0) {
+        setStatus("Начальная и конечная точки слишком близко, учитывайте минимальное расстояние в 1 км");
+        document.getElementById("run-btn").disabled = false;
+        return;
+    }
+
     const url = `/api/route-progress/?water_area=${areaId}&ice_class=${iceClass}&start_lat=${sLat}&start_lon=${sLon}&end_lat=${eLat}&end_lon=${eLon}`;
     const es = new EventSource(url);
 
@@ -145,7 +159,7 @@ document.getElementById("run-btn").addEventListener("click", () => {
 
             const route = data.route;
             if (!route || route.length === 0) {
-                setStatus("Маршрут не найден");
+                setStatus("Маршрут не найден, т.к все зоны непроходимы для данного класса судна", undefined, true);
                 return;
             }
 
@@ -153,17 +167,22 @@ document.getElementById("run-btn").addEventListener("click", () => {
             setStatus(`Маршрут построен (${route.length} точек)`);
 
 
+        } else if (data.type === "warning") {
+            es.close();
+            document.getElementById("run-btn").disabled = false;
+            setStatus(data.msg);
+
         } else if (data.type === "error") {
             es.close();
             document.getElementById("run-btn").disabled = false;
-            setStatus("Ошибка: " + data.msg);
+            setStatus("Ошибка: " + data.msg, undefined, true);
         }
     };
 
     es.onerror = () => {
         es.close();
         document.getElementById("run-btn").disabled = false;
-        setStatus("Ошибка соединения");
+        setStatus("Ошибка соединения", undefined, true);
     };
 });
 
