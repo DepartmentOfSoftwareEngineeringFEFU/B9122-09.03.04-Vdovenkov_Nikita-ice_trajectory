@@ -4,5 +4,5 @@ __pycache__/
 *.pyo
 AIS_2024_01_01.csv
 *.csv
-
+db.sqlite3
 *.csv
