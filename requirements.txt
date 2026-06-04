@@ -1,5 +1,6 @@
 asgiref==3.11.1
 Django==5.2.14
+django-extensions==3.2.3
 djangorestframework==3.17.1
 joblib==1.5.3
 numpy==2.4.4

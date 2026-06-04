@@ -237,23 +237,13 @@ def generate_cluster_route(start_lat, start_lon, end_lat, end_lon, area_polygon=
     progress(30, "Строим граф маршрута...")
     vertices, edges, finish_idx = build_layered_graph(
         start_lat, start_lon, end_lat, end_lon,
-        n_layers=4, m_half=3
+        n_layers=16, m_half=5
     )
 
     progress(40, f"Граф: {len(vertices)} вершин, {len(edges)} рёбер")
 
     progress(50, "Индексируем AIS-данные...")
     tree, courses_array = build_position_index(positions)
-
-    check_radius_deg = 2.0 / 111.0
-    if tree is not None:
-        near_start = tree.query_ball_point([start_lat, start_lon], check_radius_deg)
-        near_end = tree.query_ball_point([end_lat, end_lon], check_radius_deg)
-    else:
-        near_start, near_end = [], []
-    if len(near_start) < 5 or len(near_end) < 5:
-        progress(55, "Нет данных АИС вблизи выбранных точек")
-        return None
 
     ice_active = bool(ice_zones and ice_coefficients)
     progress(60, "Взвешиваем рёбра графа" + (" (с учётом льда)" if ice_active else "") + "...")
@@ -278,7 +268,8 @@ def generate_cluster_route(start_lat, start_lon, end_lat, end_lon, area_polygon=
 
         ice_i = get_ice_factor(lat1, lon1, ice_zones, ice_coefficients)
         ice_j = get_ice_factor(lat2, lon2, ice_zones, ice_coefficients)
-        ice_factor = max(ice_i, ice_j)
+        ice_mid = get_ice_factor((lat1 + lat2) / 2, (lon1 + lon2) / 2, ice_zones, ice_coefficients)
+        ice_factor = max(ice_i, ice_j, ice_mid)
 
         if ice_factor == float("inf"):
             weight = float("inf")
