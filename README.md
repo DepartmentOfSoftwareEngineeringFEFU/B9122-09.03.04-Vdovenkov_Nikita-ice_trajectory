@@ -3,14 +3,6 @@
 
 > **Внимание:** `git clone` может занять продолжительное время, т.к вместе с репозиторием подгружается база данных SQLite с AIS-данными.
 
-## Запуск через Docker
-```bash
-git clone https://github.com/TatarArg/ice_routing_service
-cd ice_routing_service
-docker compose up --build
-```
-Открыть в браузере: http://localhost:8000
-
 ## Запуск без Docker(рекомендуется)
 ```bash
 git clone https://github.com/DepartmentOfSoftwareEngineeringFEFU/B9122-09.03.04-Vdovenkov_Nikita-ice_trajectory
