@@ -13,7 +13,7 @@ docker compose up --build
 
 ## Запуск без Docker(рекомендуется)
 ```bash
-git clone https://github.com/TatarArg/ice_routing_service
+git clone https://github.com/DepartmentOfSoftwareEngineeringFEFU/B9122-09.03.04-Vdovenkov_Nikita-ice_trajectory
 cd B9122-09.03.04-Vdovenkov_Nikita-ice_trajectory
 python -m venv venv
 source venv/Scripts/activate
